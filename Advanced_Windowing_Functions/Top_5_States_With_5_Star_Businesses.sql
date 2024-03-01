@@ -12,3 +12,17 @@ from yelp_business
 where stars = 5
 group by 1
 order by 2 desc, 1) a where 5_star_businesses >= (select min(5_star_businesses) from cte)
+
+-- OR
+
+select state, five_star_counts
+from (
+    select state,
+           count(business_id) as five_star_counts,
+           rank() over (order by count(business_id) desc) as state_rank
+    from yelp_business
+    where stars = 5
+    group by state
+    order by state_rank, state
+) t
+where state_rank <= 5
